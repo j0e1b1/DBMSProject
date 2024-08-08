@@ -1,4 +1,4 @@
-import React, { Component, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -7,7 +7,7 @@ import {
   Text,
   Grid
 } from 'grommet';
-
+import { useNavigate } from 'react-router-dom'; // Use for navigation
 import './App.css';
 
 const theme = {
@@ -36,7 +36,41 @@ const SidebarButton = ({ label, ...rest }) => (
 );
 
 const SidebarButtons = () => {
-  const [active, setActive] = useState();
+  const [active, setActive] = useState('');
+  const navigate = useNavigate();
+
+  const handleClick = async (label) => {
+    setActive(label);
+
+    switch (label) {
+      case "Schedule Appointment":
+        navigate("/scheduleAppt");
+        break;
+      case "Sign Out":
+        await fetch("http://localhost:3001/endSession");
+        navigate("/");
+        break;
+      case "View Appointments":
+        navigate("/PatientsViewAppt");
+        break;
+      case "View Medical History":
+        try {
+          const response = await fetch("http://localhost:3001/userInSession");
+          const data = await response.json();
+          const email_in_use = data.email;
+          navigate(`/ViewOneHistory/${encodeURIComponent(email_in_use)}`);
+        } catch (error) {
+          console.error('Error fetching user session:', error);
+        }
+        break;
+      case "Settings":
+        navigate("/Settings");
+        break;
+      default:
+        break;
+    }
+  };
+
   return (
     <Grommet full theme={theme}>
       <Box fill direction="row">
@@ -46,34 +80,7 @@ const SidebarButtons = () => {
               key={label}
               label={label}
               active={label === active}
-              onClick={() => {
-                if (label === "Schedule Appointment") {
-                  window.location = "/scheduleAppt"
-                }
-                else if (label === "Sign Out") {
-                  fetch("http://localhost:3001/endSession");
-                  window.location = "/"
-                }
-                else if (label === "View Appointments") {
-                  window.location = "/PatientsViewAppt"
-                }
-                else if (label === "View Medical History") {
-                  let email_in_use = "";
-                  fetch("http://localhost:3001/userInSession")
-                    .then(res => res.json())
-                    .then(res => {
-                      var string_json = JSON.stringify(res);
-                      var email_json = JSON.parse(string_json);
-                      email_in_use = email_json.email;
-                      console.log("Email In Use Is :" + email_in_use);
-                      window.location = "/ViewOneHistory/" + email_in_use;
-                    });
-                }
-                else if (label === "Settings") {
-                  window.location = "/Settings"
-                }
-                setActive(label);
-              }}
+              onClick={() => handleClick(label)}
             />
           ))}
         </Box>
@@ -81,64 +88,62 @@ const SidebarButtons = () => {
     </Grommet>
   );
 };
-export class Home extends Component {
-  renderName = ({ name, email }) => <div key={email}>{name} {name}</div>
 
-  render() {
-    const Header = () => (
-      <Box
-        tag='header'
-        background='brand'
-        pad='small'
-        elevation='small'
-        justify='between'
-        direction='row'
-        align='center'
-        flex={false}
-        style={{borderBottom:"1px solid grey"}}
-      >
-        <a style={{ color: 'inherit', textDecoration: 'inherit'}} href="/"><Heading level='3' margin='none'>HMS</Heading></a>
+const Home = () => {
+  const Header = () => (
+    <Box
+      tag='header'
+      background='brand'
+      pad='small'
+      elevation='small'
+      justify='between'
+      direction='row'
+      align='center'
+      flex={false}
+      style={{ borderBottom: "1px solid grey" }}
+    >
+      <a style={{ color: 'inherit', textDecoration: 'inherit' }} href="/">
+        <Heading level='3' margin='none'>HMS</Heading>
+      </a>
+    </Box>
+  );
+
+  return (
+    <Grommet full theme={theme}>
+      <Box fill>
+        <Header />
+        <Grid
+          fill
+          rows={['auto', 'flex']}
+          columns={['auto', 'flex']}
+          areas={[
+            { name: 'sidebar', start: [0, 1], end: [0, 1] },
+            { name: 'main', start: [1, 1], end: [1, 1] },
+          ]}
+        >
+          <Box
+            gridArea="sidebar"
+            width="small"
+            animation={[
+              { type: 'fadeIn', duration: 300 },
+              { type: 'slideRight', size: 'xlarge', duration: 150 },
+            ]}
+          >
+            <SidebarButtons />
+          </Box>
+          <Box
+            gridArea="main"
+            justify="top"
+            align="center"
+          >
+            <Box align="center" pad="large">
+              <Heading color="#000000">Welcome Patient</Heading>
+            </Box>
+          </Box>
+        </Grid>
       </Box>
-    );
-
-    return (
-      <Grommet full={true}
-        theme={theme} >
-        <Box fill={true}>
-          <Header/>
-          <Grid
-            fill
-            rows={['auto', 'flex']}
-            columns={['auto', 'flex']}
-            areas={[
-              { name: 'sidebar', start: [0, 1], end: [0, 1] },
-              { name: 'main', start: [1, 1], end: [1, 1] },
-            ]}>
-            <Box
-              gridArea="sidebar"
-              width="small"
-              animation={[
-                { type: 'fadeIn', duration: 300 },
-                { type: 'slideRight', size: 'xlarge', duration: 150 },
-              ]}
-            >
-              <SidebarButtons />
-            </Box>
-            <Box
-              gridArea="main"
-              justify="top"
-              align="center">
-              <Box align="center" pad="large">
-                <Heading 
-                  color="#000000">Welcome Patient
-                </Heading>
-              </Box>
-            </Box>
-          </Grid>
-        </Box>
-      </Grommet>
-    );
-  }
-}
+    </Grommet>
+  );
+};
 
 export default Home;

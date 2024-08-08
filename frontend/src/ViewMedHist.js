@@ -1,109 +1,131 @@
-import React, { Component} from 'react';
-
+import React, { useState, useEffect } from 'react';
 import {
-    Box,
-    Button,
-    Heading,
-    Grommet,
-    FormField,
-    Form
+  Box,
+  Button,
+  Heading,
+  Grommet,
+  FormField,
+  Form,
+  Table,
+  TableHeader,
+  TableRow,
+  TableCell,
+  TableBody,
 } from 'grommet';
-
+import { useNavigate } from 'react-router-dom';
 import './App.css';
 
 const theme = {
-    global: {
-      colors: {
-        brand: '#000000',
-        focus: '#000000'
-      },
-      font: {
-        family: 'Lato',
-      },
+  global: {
+    colors: {
+      brand: '#000000',
+      focus: '#000000',
     },
+    font: {
+      family: 'Lato',
+    },
+  },
+};
+
+const ViewMedHist = () => {
+  const [medHistState, setMedHistState] = useState([]);
+  const [searchValue, setSearchValue] = useState('');
+  const navigate = useNavigate();
+
+  const fetchMedHist = async (value) => {
+    try {
+      const response = await fetch(`http://localhost:3001/MedHistView?name=${value}`);
+      if (!response.ok) throw new Error('Network response was not ok');
+      const data = await response.json();
+      setMedHistState(data.data || []);
+    } catch (error) {
+      console.error('Error fetching medical history:', error);
+      window.alert('An error occurred while fetching medical history.');
+    }
   };
-export class ViewMedHist extends Component {
-    
-    state = { medhiststate: [] }
 
-    componentDidMount() {
-        this.getNames("");
-        console.log(this.state.names);
-    }
+  useEffect(() => {
+    fetchMedHist('');
+  }, []);
 
-    getNames(value) {
-        let patName = " ";
-        if (value !== undefined)
-            patName = value;
-        console.log(patName);
-        fetch('http://localhost:3001/MedHistView?name='+ patName + '&variable=words')
-        .then(res => res.json())
-        .then(res => this.setState({ medhiststate: res.data }));
-    }
+  const handleSearch = (event) => {
+    event.preventDefault();
+    fetchMedHist(searchValue);
+  };
 
-    render() {
-        const { medhiststate } = this.state;
+  const Header = () => (
+    <Box
+      tag="header"
+      background="brand"
+      pad="small"
+      elevation="small"
+      justify="between"
+      direction="row"
+      align="center"
+      flex={false}
+    >
+      <a style={{ color: 'inherit', textDecoration: 'inherit' }} href="/">
+        <Heading level="3" margin="none">
+          HMS
+        </Heading>
+      </a>
+    </Box>
+  );
 
-        const Header = () => (
-            <Box
-                tag='header'
-                background='brand'
-                pad='small'
-                elevation='small'
-                justify='between'
-                direction='row'
-                align='center'
-                flex={false}
-            >
-               <a style={{ color: 'inherit', textDecoration: 'inherit'}} href="/"><Heading level='3' margin='none'>HMS</Heading></a>
+  const Body = () => (
+    <Box width="100vw">
+      <Box className="panel panel-default p50 uth-panel">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableCell scope="col" border="bottom">
+                Name
+              </TableCell>
+              <TableCell scope="col" border="bottom">
+                Profile
+              </TableCell>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {medHistState.map((patient) => (
+              <TableRow key={patient.id}>
+                <TableCell>{patient.name}</TableCell>
+                <TableCell>
+                  <Button
+                    label="Medical Profile"
+                    onClick={() => navigate(`/ViewOneHistory/${patient.email}`)}
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
+    </Box>
+  );
 
-            </Box>
-        );
-
-        const Body = () => (
-            <div className="container" style={{width:"100vw"}}>
-                <div className="panel panel-default p50 uth-panel">
-                    <table className="table table-hover">
-                        <thead>
-                            <tr>
-                                <th style={{width:"50vw"}}>Name</th>
-                                <th style={{width:"50vw"}}>Profile</th>
-                            </tr>
-                        </thead> 
-                        <tbody>
-                            {medhiststate.map(patient =>
-                                <tr key={patient.id} style={{textAlign:"center"}}>
-                                    <td>{patient.Name} </td>
-                                    <td>
-                                        <Button label="Medical Profile" href={'/ViewOneHistory/' + patient.email}/>
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        );
-        return (
-            <Grommet full={true}
-            theme = {theme}>
-                <Header />
-                <Box fill={true} align="center">
-                    <Form
-                        onSubmit={({ value }) => {
-                            this.getNames(value.email);
-                        }}>
-                        <h4 style={{textAlign:"center", marginBottom:"0"}}>Search By Name</h4>
-                        <FormField name="email" align="center" />
-                        <div align="center">
-                            <Button type="submit" primary label="Submit" />
-                        </div>
-                    </Form>
-                    <Body />
-                </Box>
-            </Grommet>
-        );
-    }
-}
+  return (
+    <Grommet full theme={theme}>
+      <Header />
+      <Box fill align="center" pad="medium">
+        <Form onSubmit={handleSearch}>
+          <Heading level="4" textAlign="center" margin={{ bottom: 'small' }}>
+            Search By Name
+          </Heading>
+          <FormField
+            name="name"
+            value={searchValue}
+            onChange={(event) => setSearchValue(event.target.value)}
+            placeholder="Enter name"
+          />
+          <Box direction="row" justify="center" margin={{ top: 'small' }}>
+            <Button type="submit" primary label="Submit" />
+          </Box>
+        </Form>
+        <Body />
+      </Box>
+    </Grommet>
+  );
+};
 
 export default ViewMedHist;

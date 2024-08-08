@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Button,
@@ -7,7 +7,9 @@ import {
   TextArea,
   Grommet
 } from 'grommet';
+import { useParams } from 'react-router-dom'; // Use for accessing route params
 import './App.css';
+
 const theme = {
   global: {
     colors: {
@@ -20,9 +22,7 @@ const theme = {
     },
   },
 };
-var diagnosis;
-var prescription;
-var id;
+
 const AppBar = (props) => (
   <Box
     tag='header'
@@ -35,83 +35,75 @@ const AppBar = (props) => (
     {...props} />
 );
 
-const DiagnosisTextArea = () => {
-  const [value, setValue] = React.useState(" ");
+const DiagnosisTextArea = ({ value, onChange }) => (
+  <Grommet theme={theme}>
+    <h4>Diagnosis</h4>
+    <TextArea
+      placeholder="Enter Diagnosis"
+      label="Enter Diagnosis"
+      value={value}
+      onChange={onChange}
+      style={{ width: "50vw", height: "12vw" }}
+      fill
+      required
+    />
+  </Grommet>
+);
 
-  const onChange = event => {
-    setValue(event.target.value);
-    diagnosis = event.target.value;
+const PrescriptionTextArea = ({ value, onChange }) => (
+  <Grommet theme={theme}>
+    <h4>Prescription</h4>
+    <TextArea
+      placeholder="Enter Prescription"
+      label="Enter Prescription"
+      value={value}
+      onChange={onChange}
+      style={{ width: "50vw", height: "12vw" }}
+      fill
+      required
+    />
+  </Grommet>
+);
+
+const Diagnose = () => {
+  const [diagnosis, setDiagnosis] = useState("");
+  const [prescription, setPrescription] = useState("");
+  const { id } = useParams(); // Access route params using useParams hook
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    try {
+      await fetch(`http://localhost:3001/Diagnose?diagnosis=${encodeURIComponent(diagnosis)}&prescription=${encodeURIComponent(prescription)}&id=${id}`);
+      window.alert("Diagnosis Submitted!");
+    } catch (error) {
+      console.error("Error submitting diagnosis:", error);
+    }
   };
 
   return (
-    <Grommet theme={theme}>
-      <h4>Diagnosis</h4>
-      <TextArea
-        placeholder="Enter Diagnosis"
-        label="Enter Diagnosis"
-        value={value}
-        onChange={onChange}
-        style={{width:"50vw", height:"12vw"}}
-        fill
-        required />
-    </Grommet>
-  );
-};
-
-const PrescriptionTextArea = () => {
-  const [value, setValue] = React.useState(" ");
-  const onChange = event => {
-    setValue(event.target.value);
-    prescription = event.target.value;
-  };
-  return (
-    <Grommet theme={theme}>
-        <h4>Prescription</h4>
-        <TextArea
-          placeholder="Enter Prescription"
-          label="Enter Prescription"
-          value={value}
-          style={{width:"50vw", height:"12vw"}}
-          onChange={onChange} fill
-          required />
-    </Grommet>
-  );
-};
-
-export class Diagnose extends Component {
-  constructor(props) {
-    super(props);
-    id = props.match.params.id;
-  }
-  render() {
-    return (
-      <Grommet theme={theme} full>
-        <AppBar>
-        <a style={{ color: 'inherit', textDecoration: 'inherit'}} href="/"><Heading level='3' margin='none'>HMS</Heading></a>
-        </AppBar>
-        <Box align="center" gap="small">
-          <Form
-            onSubmit={({ value }) => {
-              fetch("http://localhost:3001/diagnose?diagnosis=" + diagnosis + "&prescription=" + prescription
-              + "&id=" + id).then(()=>{
-              })
-              window.alert("Diagnosis Submitted!");
-            }}
-          >
-            <DiagnosisTextArea />
-            <PrescriptionTextArea />
-            <br />
-            <Box align="center">
+    <Grommet theme={theme} full>
+      <AppBar>
+        <a style={{ color: 'inherit', textDecoration: 'inherit' }} href="/">
+          <Heading level='3' margin='none'>HMS</Heading>
+        </a>
+      </AppBar>
+      <Box align="center" gap="small">
+        <Form onSubmit={handleSubmit}>
+          <DiagnosisTextArea value={diagnosis} onChange={(event) => setDiagnosis(event.target.value)} />
+          <PrescriptionTextArea value={prescription} onChange={(event) => setPrescription(event.target.value)} />
+          <br />
+          <Box align="center">
             <Button
               label="Submit Diagnosis"
               type="submit"
               primary
             />
-            </Box>
-          </Form>
-        </Box>
-      </Grommet>
-    );
-  }
-}
+          </Box>
+        </Form>
+      </Box>
+    </Grommet>
+  );
+};
+
 export default Diagnose;

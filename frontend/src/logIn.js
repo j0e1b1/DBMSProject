@@ -1,5 +1,5 @@
-import React, { Component} from 'react';
-import { withRouter } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -9,7 +9,6 @@ import {
   Form,
   CheckBox,
 } from 'grommet';
-
 import './App.css';
 
 const theme = {
@@ -37,104 +36,92 @@ const AppBar = (props) => (
     {...props} />
 );
 
-class LogIn extends Component {
-  state = { isDoctor: false }
+const LogIn = () => {
+  const [isDoctor, setIsDoctor] = useState(false);
+  const navigate = useNavigate();
 
-  constuctor() {
-    this.routeChange = this.routeChange.bind(this);
-  }
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const email = formData.get('email');
+    const password = formData.get('password');
+    const isDoc = formData.get('isDoc') === 'on';
 
-  routeChange() {
-    let path = '/Home';
-    this.props.history.push(path);
-  }
+    try {
+      const endpoint = isDoc
+        ? `http://localhost:3001/checkDoclogin?email=${email}&password=${password}`
+        : `http://localhost:3001/checklogin?email=${email}&password=${password}`;
 
-  render() {
-    const { isDoctor } = this.state; // If doctor, will query from doctor table
+      const response = await fetch(endpoint);
+      const data = await response.json();
 
-    return (
-      <Grommet theme={theme} full>
-        <AppBar>
-        <a style={{ color: 'inherit', textDecoration: 'inherit'}} href="/"><Heading level='3' margin='none'>HMS</Heading></a>
-        </AppBar>
+      if (data.data.length === 0) {
+        window.alert("Invalid Log In");
+      } else {
+        navigate(isDoc ? "DocHome" : "/Home");
+        console.log(data.data);
+      }
+    } catch (error) {
+      console.error("Error logging in:", error);
+      window.alert("An error occurred while logging in.");
+    }
+  };
 
-        <Box
-          fill
-          align="center"
-          justify="top"
-          pad="medium">
-          <Box
-            width="medium"
-            pad="medium">
-            <Form
+  return (
+    <Grommet theme={theme} full>
+      <AppBar>
+        <a style={{ color: 'inherit', textDecoration: 'inherit' }} href="/">
+          <Heading level='3' margin='none'>HMS</Heading>
+        </a>
+      </AppBar>
 
-              onReset={event => console.log(event)}
-              onSubmit={({ value }) => {
-                console.log("Submit", value);
-                if (value.isDoc === true) {
-                  fetch("http://localhost:3001/checkDoclogin?email=" + value.email +
-                    "&password=" + value.password)
-                    .then(res => res.json())
-                    .then(res => {
-                      if (res.data.length === 0) {
-                        window.alert("Invalid Log In");
-                      } else {
-                        window.location = "DocHome";
-                        console.log(res.data);
-                      }
-                    });
-                } else {
-                  fetch("http://localhost:3001/checklogin?email=" + value.email +
-                    "&password=" + value.password)
-                    .then(res => res.json())
-                    .then(res => {
-                      if (res.data.length === 0) {
-                        window.alert("Invalid Log In");
-                      } else {
-                        window.location = "/Home";
-                        console.log(res.data);
-                      }
-                    });
-                }
-              }
-              }>
-              <FormField
-                color="#00739D"
-                label="Email"
-                name="email"
-                type="email"
-                placeholder = "Please enter your email."
-                required />
-              <FormField
-                color="#00739D"
-                type='password'
-                label="Password"
-                name="password"
-                placeholder = "Please enter your password."
-                required />
-              <FormField
-                component={CheckBox}
-                checked={isDoctor}
-                margin="large"
-                label="I'm a doctor"
-                name="isDoc"
-                onChange={(event) => {
-                  this.setState({ isDoctor: event.target.checked })
-                }}
+      <Box fill align="center" justify="top" pad="medium">
+        <Box width="medium" pad="medium">
+          <Form onSubmit={handleSubmit}>
+            <FormField
+              color="#00739D"
+              label="Email"
+              name="email"
+              type="email"
+              placeholder="Please enter your email."
+              required
+            />
+            <FormField
+              color="#00739D"
+              type='password'
+              label="Password"
+              name="password"
+              placeholder="Please enter your password."
+              required
+            />
+            <FormField
+              component={CheckBox}
+              checked={isDoctor}
+              margin="large"
+              label="I'm a doctor"
+              name="isDoc"
+              onChange={(event) => setIsDoctor(event.target.checked)}
+            />
+            <Box direction="column" align="center">
+              <Button
+                style={{ textAlign: 'center', margin: '1rem' }}
+                type="submit"
+                label="Log In"
+                fill="horizontal"
+                primary
               />
-              <Box direction="column" align="center" >
-                <Button style={{ textAlign: 'center' , margin:'1rem'}}
-                 type="submit" label="Log In" fill="horizontal" primary />
-                <Button label="Create Account"
-                  style={{ textAlign: 'center' , margin:'0.5rem'}}
-                  fill="horizontal"
-                  href="/createAcc" />
-              </Box>
-            </Form>
-          </Box>
+              <Button
+                label="Create Account"
+                style={{ textAlign: 'center', margin: '0.5rem' }}
+                fill="horizontal"
+                href="/createAcc"
+              />
+            </Box>
+          </Form>
         </Box>
-      </Grommet>
-    );
-  }
-}
-export default withRouter(LogIn);
+      </Box>
+    </Grommet>
+  );
+};
+
+export default LogIn;

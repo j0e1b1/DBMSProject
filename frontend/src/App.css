@@ -1,31 +1,47 @@
+/* Use CSS variables for easier theme management */
+:root {
+  --primary-color: #282c34;
+  --text-color: white;
+  --link-color: #000000;
+  --padding: 10px;
+  --spacing: 50px;
+  --font-size: calc(10px + 2vmin);
+}
+
+/* Center text alignment for .App */
 .App {
   text-align: center;
 }
 
+/* Set logo size relative to viewport dimensions */
 .App-logo {
   height: 40vmin;
 }
 
+/* Header styling */
 .App-header {
-  background-color: #282c34;
+  background-color: var(--primary-color);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  font-size: var(--font-size);
+  color: var(--text-color);
 }
 
+/* Link color */
 .App-link {
-  color: #000000;
+  color: var(--link-color);
 }
 
+/* Table styling with improved readability */
 table {
   border-collapse: separate;
-  border-spacing: 50px 0;
+  border-spacing: var(--spacing) 0;
 }
 
+/* Table cell padding */
 td {
-  padding: 10px 0;
+  padding: var(--padding) 0;
 }

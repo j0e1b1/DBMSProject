@@ -5,14 +5,14 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('hms-backend:server');
+var debug = require('debug')('hospital-management-system-dbms:server');
 var http = require('http');
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(2999);//process.env.PORT || '3001');
+var port = normalizePort(process.env.PORT || '3001');
 app.set('port', port);
 
 /**
@@ -87,4 +87,5 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  console.log('Server running on port ' + bind);
 }
