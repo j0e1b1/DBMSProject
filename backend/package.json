@@ -1,0 +1,20 @@
+{
+  "homepage": "https://github.com/anthasslander/Project.git",
+  "name": "hms-backend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "debug": "^4.3.4",
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "http-errors": "^2.0.0",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.11.0",
+    "path": "^0.12.7",
+    "pug": "^3.0.3"
+  }
+}
