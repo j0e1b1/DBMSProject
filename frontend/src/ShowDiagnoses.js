@@ -6,9 +6,10 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableRow
+  TableRow,
+  Button
 } from 'grommet';
-import { useParams } from 'react-router-dom'; // for accessing route params
+import { useParams, useNavigate } from 'react-router-dom'; // for accessing route params and navigation
 import './App.css';
 
 const theme = {
@@ -26,6 +27,7 @@ const theme = {
 const ShowDiagnoses = () => {
   const { id } = useParams(); // using react-router-dom to get the id from the route
   const [diagnoses, setDiagnoses] = useState([]);
+  const navigate = useNavigate(); // for navigation to view bill
 
   useEffect(() => {
     fetch(`http://localhost:3001/showDiagnoses?id=${id}`)
@@ -50,39 +52,50 @@ const ShowDiagnoses = () => {
     </Box>
   );
 
+  const handleViewBill = (apptId) => {
+    navigate(`/viewBill/${apptId}`);
+  };
+
   const Body = () => (
     <div className="container">
       <div className="panel panel-default p50 uth-panel">
         {diagnoses.length > 0 ? (
           diagnoses.map((diagnosis, index) => (
-            <Table key={index}>
-              <TableBody>
-                <TableRow>
-                  <TableCell scope="row">
-                    <strong>Appointment Id</strong>
-                  </TableCell>
-                  <TableCell>{diagnosis.appt}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell scope="row">
-                    <strong>Doctor</strong>
-                  </TableCell>
-                  <TableCell>{diagnosis.doctor}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell scope="row">
-                    <strong>Diagnosis</strong>
-                  </TableCell>
-                  <TableCell>{diagnosis.diagnosis}</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell scope="row">
-                    <strong>Prescription</strong>
-                  </TableCell>
-                  <TableCell>{diagnosis.prescription}</TableCell>
-                </TableRow>
-              </TableBody>
-            </Table>
+            <div key={index}>
+              <Table>
+                <TableBody>
+                  <TableRow>
+                    <TableCell scope="row">
+                      <strong>Appointment Id</strong>
+                    </TableCell>
+                    <TableCell>{diagnosis.appt}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell scope="row">
+                      <strong>Doctor</strong>
+                    </TableCell>
+                    <TableCell>{diagnosis.doctor}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell scope="row">
+                      <strong>Diagnosis</strong>
+                    </TableCell>
+                    <TableCell>{diagnosis.diagnosis}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell scope="row">
+                      <strong>Prescription</strong>
+                    </TableCell>
+                    <TableCell>{diagnosis.prescription}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+              <Button
+                label="View Bill"
+                onClick={() => handleViewBill(diagnosis.appt)}
+                margin={{ top: 'small' }}
+              />
+            </div>
           ))
         ) : (
           <p>No diagnoses found.</p>
