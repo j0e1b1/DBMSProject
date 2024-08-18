@@ -26,14 +26,15 @@ const theme = {
 
 const AppBar = (props) => (
   <Box
-    tag='header'
-    direction='row'
-    align='center'
-    justify='between'
-    background='brand'
-    pad={{ left: 'medium', right: 'small', vertical: 'small' }}
-    style={{ zIndex: '1' }}
-    {...props} />
+    tag="header"
+    direction="row"
+    align="center"
+    justify="between"
+    background="brand"
+    pad={{ left: "medium", right: "small", vertical: "small" }}
+    style={{ zIndex: "1" }}
+    {...props}
+  />
 );
 
 const LogIn = () => {
@@ -43,9 +44,9 @@ const LogIn = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const email = formData.get('email');
-    const password = formData.get('password');
-    const isDoc = formData.get('isDoc') === 'on';
+    const email = formData.get("email");
+    const password = formData.get("password");
+    const isDoc = isDoctor;
 
     try {
       const endpoint = isDoc
@@ -58,7 +59,7 @@ const LogIn = () => {
       if (data.data.length === 0) {
         window.alert("Invalid Log In");
       } else {
-        navigate(isDoc ? "DocHome" : "/Home");
+        navigate(isDoc ? "/DocHome" : "/Home");
         console.log(data.data);
       }
     } catch (error) {
@@ -70,16 +71,18 @@ const LogIn = () => {
   return (
     <Grommet theme={theme} full>
       <AppBar>
-        <a style={{ color: 'inherit', textDecoration: 'inherit' }} href="/">
-          <Heading level='3' margin='none'>HMS</Heading>
+        <a style={{ color: "inherit", textDecoration: "inherit" }} href="/">
+          <Heading level="3" margin="none">
+            HMS
+          </Heading>
         </a>
       </AppBar>
 
-      <Box fill align="center" justify="top" pad="medium">
-        <Box width="medium" pad="medium">
+      <div className="container">
+        <div className="background-image"></div>
+        <Box className="login-box" pad="medium">
           <Form onSubmit={handleSubmit}>
             <FormField
-              color="#00739D"
               label="Email"
               name="email"
               type="email"
@@ -87,8 +90,7 @@ const LogIn = () => {
               required
             />
             <FormField
-              color="#00739D"
-              type='password'
+              type="password"
               label="Password"
               name="password"
               placeholder="Please enter your password."
@@ -104,22 +106,22 @@ const LogIn = () => {
             />
             <Box direction="column" align="center">
               <Button
-                style={{ textAlign: 'center', margin: '1rem' }}
                 type="submit"
                 label="Log In"
                 fill="horizontal"
                 primary
+                style={{ margin: "1rem" }}
               />
               <Button
                 label="Create Account"
-                style={{ textAlign: 'center', margin: '0.5rem' }}
                 fill="horizontal"
                 href="/createAcc"
+                style={{ margin: "0.5rem" }}
               />
             </Box>
           </Form>
         </Box>
-      </Box>
+      </div>
     </Grommet>
   );
 };
