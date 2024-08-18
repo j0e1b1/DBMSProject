@@ -49,12 +49,22 @@ const DropContent = ({ date: initialDate, time: initialTime, onClose }) => {
   const [time, setTime] = useState(initialTime);
 
   const close = () => {
-    let parsedTime = time.split(":");
-    let startHour = parseInt(parsedTime[0], 10);
-    let endHour = startHour + 1;
-    let endTime = `${endHour}:00`;
+    // Split the time into hours and minutes
+    let [hours, minutes] = time.split(":").map(Number);
 
-    onClose(date || initialDate, time || initialTime, endTime);
+    // Create a Date object with the current date and selected time
+    let startTime = new Date();
+    startTime.setHours(hours, minutes, 0, 0);
+
+    // Add one hour to the start time
+    let endTime = new Date(startTime.getTime() + 60 * 60 * 1000);
+
+    // Format end time as HH:mm
+    let endHours = endTime.getHours().toString().padStart(2, '0');
+    let endMinutes = endTime.getMinutes().toString().padStart(2, '0');
+    let formattedEndTime = `${endHours}:${endMinutes}`;
+
+    onClose(date || initialDate, time || initialTime, formattedEndTime);
   };
 
   return (
@@ -79,13 +89,13 @@ const DropContent = ({ date: initialDate, time: initialTime, onClose }) => {
               {
                 length: [1, 2],
                 options: Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0')),
-                regexp: /^1[1-2]$|^[0-9]$/,
+                regexp: /^[0-9]{1,2}$/,
                 placeholder: "hh"
               },
               { fixed: ":" },
               {
                 length: 2,
-                options: ["00"],
+                options: Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0')),
                 regexp: /^[0-5][0-9]$/,
                 placeholder: "mm"
               }
@@ -226,6 +236,7 @@ const SchedulingAppt = () => {
   const [concerns, setConcerns] = useState("");
   const [symptoms, setSymptoms] = useState("");
   const [doctor, setDoctor] = useState("");
+  const [showViewBill, setShowViewBill] = useState(false);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -249,6 +260,7 @@ const SchedulingAppt = () => {
                       fetch(`http://localhost:3001/addToPatientSeeAppt?email=${email_in_use}&id=${gen_uid}&concerns=${concerns}&symptoms=${symptoms}`)
                         .then(() => {
                           window.alert("Appointment successfully scheduled!");
+                          setShowViewBill(true); // Show the "View Bill" button
                         });
                     });
                 });
@@ -284,6 +296,16 @@ const SchedulingAppt = () => {
               type="submit"
               primary
             />
+            {showViewBill && (
+              <Button
+                label="View Bill"
+                onClick={() => {
+                  // Logic to view the bill
+                  window.alert("View Bill clicked!");
+                }}
+                color="#00739D"
+              />
+            )}
           </Box>
         </Form>
       </Box>
