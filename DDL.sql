@@ -84,3 +84,4 @@ FOREIGN KEY (doctor) REFERENCES Doctor (email) ON DELETE CASCADE,
 FOREIGN KEY (history) REFERENCES MedicalHistory (id) ON DELETE CASCADE,
 PRIMARY KEY (history, doctor)
 );
+

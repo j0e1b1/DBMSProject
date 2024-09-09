@@ -66,61 +66,62 @@ const PatientsViewAppointments = () => {
     }
   };
 
-  const Body = () => (
-    <div className="container">
-      <div className="panel panel-default p50 uth-panel">
-        <table className="table table-hover">
-          <thead>
-            <tr>
-              <th>Date of Appointment</th>
-              <th>Start Time</th>
-              <th>End Time</th>
-              <th>Concerns</th>
-              <th>Symptoms</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {appointmentsState.map(patient => (
-              <tr key={patient.ID}>
-                <td align="center">{new Date(patient.theDate).toLocaleDateString().substring(0, 10)}</td>
-                <td align="center">{patient.theStart.substring(0, 5)}</td>
-                <td align="center">{patient.theEnd.substring(0, 5)}</td>
-                <td align="center">{patient.theConcerns}</td>
-                <td align="center">{patient.theSymptoms}</td>
-                <td align="center">{patient.status}</td>
-                <td>
-                  <Button label="See Diagnosis" href={`/showDiagnoses/${patient.ID}`} />
-                  {patient.status === "NotDone" ? (
-                    <Button
-                      label="Cancel"
-                      onClick={() => handleCancelOrDelete(patient.ID, true)}
-                    />
-                  ) : (
-                    <Button
-                      label="Delete"
-                      onClick={() => handleCancelOrDelete(patient.ID, false)}
-                    />
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-
   return (
     <Grommet theme={theme} full>
-      <Box>
+      <Box fill>
         <AppBar>
           <a style={{ color: 'inherit', textDecoration: 'inherit' }} href="/">
             <Heading level='3' margin='none'>HMS</Heading>
           </a>
         </AppBar>
-        <Body />
+        <Box
+          fill
+          pad={{ vertical: 'large', horizontal: 'medium' }}
+          align="center"
+          justify="start"
+        >
+          <table className="table table-hover" style={{ width: '100%' }}>
+            <thead>
+              <tr>
+                <th>Date of Appointment</th>
+                <th>Start Time</th>
+                <th>End Time</th>
+                <th>Concerns</th>
+                <th>Symptoms</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {appointmentsState.map(patient => (
+                <tr key={patient.ID}>
+                  <td align="center">{new Date(patient.theDate).toLocaleDateString().substring(0, 10)}</td>
+                  <td align="center">{patient.theStart.substring(0, 5)}</td>
+                  <td align="center">{patient.theEnd.substring(0, 5)}</td>
+                  <td align="center">{patient.theConcerns}</td>
+                  <td align="center">{patient.theSymptoms}</td>
+                  <td align="center">{patient.status}</td>
+                  <td>
+                    <Box direction="row" gap="small" align="center" justify="center">
+                      <Button label="See Diagnosis" href={`/showDiagnoses/${patient.ID}`} />
+                      {patient.status === "NotDone" ? (
+                        <Button
+                          label="Cancel"
+                          onClick={() => handleCancelOrDelete(patient.ID, true)}
+                        />
+                      ) : (
+                        <Button
+                          label="Delete"
+                          onClick={() => handleCancelOrDelete(patient.ID, false)}
+                        />
+                      )}
+                    </Box>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Box>
       </Box>
     </Grommet>
   );

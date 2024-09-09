@@ -7,7 +7,7 @@ import {
   TextArea,
   Grommet
 } from 'grommet';
-import { useParams } from 'react-router-dom'; // Use for accessing route params
+import { useNavigate, useParams } from 'react-router-dom';
 import './App.css';
 
 const theme = {
@@ -40,7 +40,6 @@ const DiagnosisTextArea = ({ value, onChange }) => (
     <h4>Diagnosis</h4>
     <TextArea
       placeholder="Enter Diagnosis"
-      label="Enter Diagnosis"
       value={value}
       onChange={onChange}
       style={{ width: "50vw", height: "12vw" }}
@@ -55,7 +54,6 @@ const PrescriptionTextArea = ({ value, onChange }) => (
     <h4>Prescription</h4>
     <TextArea
       placeholder="Enter Prescription"
-      label="Enter Prescription"
       value={value}
       onChange={onChange}
       style={{ width: "50vw", height: "12vw" }}
@@ -68,17 +66,38 @@ const PrescriptionTextArea = ({ value, onChange }) => (
 const Diagnose = () => {
   const [diagnosis, setDiagnosis] = useState("");
   const [prescription, setPrescription] = useState("");
-  const { id } = useParams(); // Access route params using useParams hook
+  const { id } = useParams();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    if (!diagnosis || !prescription) {
+      window.alert("Please fill in both fields.");
+      return;
+    }
+
     try {
-      await fetch(`http://localhost:3001/Diagnose?diagnosis=${encodeURIComponent(diagnosis)}&prescription=${encodeURIComponent(prescription)}&id=${id}`);
-      window.alert("Diagnosis Submitted!");
+      const response = await fetch('http://localhost:3001/Diagnose', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ diagnosis, prescription, id }),
+      });
+
+      if (response.ok) {
+        window.alert("Diagnosis Submitted!");
+      } else {
+        console.error("Error submitting diagnosis:", response.statusText);
+      }
     } catch (error) {
       console.error("Error submitting diagnosis:", error);
     }
+  };
+
+  const handleOrderLabTest = () => {
+    navigate(`/order-lab-test/${id}`);
   };
 
   return (
@@ -93,11 +112,17 @@ const Diagnose = () => {
           <DiagnosisTextArea value={diagnosis} onChange={(event) => setDiagnosis(event.target.value)} />
           <PrescriptionTextArea value={prescription} onChange={(event) => setPrescription(event.target.value)} />
           <br />
-          <Box align="center">
+          <Box align="center" gap="medium" direction="row">
             <Button
               label="Submit Diagnosis"
               type="submit"
               primary
+            />
+            <Button
+              label="Order Lab Test"
+              type="button"
+              onClick={handleOrderLabTest}
+              secondary
             />
           </Box>
         </Form>

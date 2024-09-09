@@ -22,18 +22,54 @@ const theme = {
   },
 };
 
-const SidebarButton = ({ label, ...rest }) => (
-  <Button plain {...rest}>
-    {({ hover }) => (
-      <Box
-        background={hover ? "#DADADA" : undefined}
-        pad={{ horizontal: "large", vertical: "medium" }}
+const SidebarButton = ({ label, onClick, dropdownItems }) => {
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  return (
+    <Box>
+      <Button
+        plain
+        onClick={onClick}
+        onMouseEnter={() => setShowDropdown(true)}
+        onMouseLeave={() => setShowDropdown(false)}
       >
-        <Text size="large">{label}</Text>
-      </Box>
-    )}
-  </Button>
-);
+        {({ hover }) => (
+          <Box
+            background={hover ? "#DADADA" : undefined}
+            pad={{ horizontal: "large", vertical: "medium" }}
+          >
+            <Text size="large">{label}</Text>
+          </Box>
+        )}
+      </Button>
+      {dropdownItems && showDropdown && (
+        <Box
+          background="light-2"
+          pad={{ vertical: "small" }}
+          onMouseEnter={() => setShowDropdown(true)}
+          onMouseLeave={() => setShowDropdown(false)}
+        >
+          {dropdownItems.map((item, index) => (
+            <Button
+              key={index}
+              plain
+              onClick={() => {}}
+            >
+              {({ hover }) => (
+                <Box
+                  background={hover ? "#E0E0E0" : undefined}
+                  pad={{ horizontal: "large", vertical: "medium" }}
+                >
+                  <Text size="medium">{item}</Text>
+                </Box>
+              )}
+            </Button>
+          ))}
+        </Box>
+      )}
+    </Box>
+  );
+};
 
 const SidebarButtons = () => {
   const [active, setActive] = useState();
@@ -57,7 +93,7 @@ const SidebarButtons = () => {
     <Grommet full theme={theme}>
       <Box fill direction="row">
         <Box background="brand">
-          {["Appointments", "View Patients", "Settings", "Sign Out"].map(label => (
+          {["Appointments", "View Patients", "Settings"].map(label => (
             <SidebarButton
               key={label}
               label={label}
@@ -65,6 +101,18 @@ const SidebarButtons = () => {
               onClick={() => handleNavigation(label)}
             />
           ))}
+          <SidebarButton
+            label="Lab result"
+            dropdownItems={["Generate Lab Result"]}
+          />
+          <SidebarButton
+            label="Insurance"
+            dropdownItems={["View Insurance Details"]}
+          />
+          <SidebarButton
+            label="Sign Out"
+            onClick={() => handleNavigation("Sign Out")}
+          />
         </Box>
       </Box>
     </Grommet>

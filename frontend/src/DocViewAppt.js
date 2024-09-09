@@ -1,17 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Box,
-  Button,
-  Heading,
-  Grommet,
-} from 'grommet';
+import { Box, Button, Heading, Grommet } from 'grommet';
 import './App.css';
 
 const theme = {
   global: {
     colors: {
       brand: '#000000',
-      focus: '#000000'
+      focus: '#000000',
     },
     font: {
       family: 'Lato',
@@ -37,9 +32,19 @@ const Header = () => (
 );
 
 const Body = ({ apptlist, onCancel }) => (
-  <div className="container">
-    <div className="panel panel-default p50 uth-panel">
-      <table className="table table-hover">
+  <Box
+    pad="medium"
+    align="center"
+    justify="start"
+    overflow="auto"
+    flex={false}
+    height={{ min: '100vh' }}
+  >
+    <Box
+      pad="medium"
+      width="large"
+    >
+      <table className="table table-hover" style={{ width: '100%' }}>
         <thead>
           <tr>
             <th>ID</th>
@@ -55,28 +60,29 @@ const Body = ({ apptlist, onCancel }) => (
         <tbody>
           {apptlist.map(appt => (
             <tr key={appt.id}>
-              <td>{appt.id}</td>
-              <td>{appt.name}</td>
-              <td>{new Date(appt.date).toLocaleDateString()}</td>
-              <td>{appt.starttime}</td>
-              <td>{appt.concerns}</td>
-              <td>{appt.symptoms}</td>
-              <td>{appt.status}</td>
-              <td>
-                <Button label="Diagnose" href={`/Diagnose/${appt.id}`} />
-                {appt.status === "NotDone" && (
+              <td className="cell-padding">{appt.id}</td>
+              <td className="cell-padding">{appt.name}</td>
+              <td className="cell-padding">{new Date(appt.date).toLocaleDateString()}</td>
+              <td className="cell-padding">{appt.starttime}</td>
+              <td className="cell-padding">{appt.concerns}</td>
+              <td className="cell-padding">{appt.symptoms}</td>
+              <td className="cell-padding">{appt.status}</td>
+              <td className="cell-padding">
+                <Box direction="row" gap="small">
+                  <Button label="Diagnose" href={`/Diagnose/${appt.id}`} />
                   <Button
                     label="Cancel"
                     onClick={() => onCancel(appt.id)}
+                    disabled={appt.status?.trim() !== "NotDone"}
                   />
-                )}
+                </Box>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
-  </div>
+    </Box>
+  </Box>
 );
 
 const DocViewAppt = () => {
