@@ -564,6 +564,42 @@ app.get('/deleteAppt', (req, res) => {
   });
 });
 
+
+
+
+// To order a lab test
+app.post('/order-lab-test', async (req, res) => {
+  const { name, date, appointment_id } = req.body; // Use req.body for POST requests
+
+  try {
+    // Insert the data into the database
+    const query = 'INSERT INTO labtest (name, date, appointment_id) VALUES (?, ?, ?)';
+     con.execute(query, [name, date, appointment_id]); // Ensure the variable names match
+
+    res.status(200).send('Lab test ordered successfully'); // Response indicating success
+  } catch (error) {
+    console.error('Error adding lab test:', error);
+    res.status(500).send('Error adding lab test: ' + error.message); // More detailed error message
+  }
+});
+
+app.post('/generate-test-result', async (req, res) => {
+  const { id, result } = req.body; // Changed from test_id to id
+
+  try {
+    const query = 'UPDATE labtest SET result = ? WHERE id = ?'; // Updated query to use id
+    con.execute(query, [result, id]);
+
+    res.status(200).send('Lab result generated successfully');
+  } catch (error) {
+    console.error('Error generating lab result:', error);
+    res.status(500).send('Error generating lab result: ' + error.message);
+  }
+});
+
+
+
+
 app.use(function (req, res, next) {
   next(createError(404));
 });
@@ -576,5 +612,5 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
 
+module.exports = app;

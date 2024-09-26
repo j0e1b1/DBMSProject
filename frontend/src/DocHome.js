@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  Heading,
-  Grommet,
-  Grid,
-  Text
-} from 'grommet';
-import { useNavigate } from 'react-router-dom'; // Use for navigation
+import { Box, Button, Heading, Grommet, Grid, Text } from 'grommet';
+import { useNavigate } from 'react-router-dom';
 import './App.css';
 
 const theme = {
@@ -22,7 +15,7 @@ const theme = {
   },
 };
 
-const SidebarButton = ({ label, onClick, dropdownItems }) => {
+const SidebarButton = ({ label, onClick, dropdownItems, onDropdownItemClick }) => {
   const [showDropdown, setShowDropdown] = useState(false);
 
   return (
@@ -53,7 +46,7 @@ const SidebarButton = ({ label, onClick, dropdownItems }) => {
             <Button
               key={index}
               plain
-              onClick={() => {}}
+              onClick={() => onDropdownItemClick(item)}
             >
               {({ hover }) => (
                 <Box
@@ -72,21 +65,12 @@ const SidebarButton = ({ label, onClick, dropdownItems }) => {
 };
 
 const SidebarButtons = () => {
-  const [active, setActive] = useState();
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
 
-  const handleNavigation = (label) => {
-    if (label === "Appointments") {
-      navigate("/ApptList");
-    } else if (label === "Sign Out") {
-      fetch("http://localhost:3001/endSession");
-      navigate("/");
-    } else if (label === "Settings") {
-      navigate("/DocSettings");
-    } else if (label === "View Patients") {
-      navigate("/MedHistView");
+  const handleDropdownItemClick = (item) => {
+    if (item === "Generate Lab Result") {
+      navigate("/Generatetestresult1");
     }
-    setActive(label);
   };
 
   return (
@@ -97,21 +81,25 @@ const SidebarButtons = () => {
             <SidebarButton
               key={label}
               label={label}
-              active={label === active}
-              onClick={() => handleNavigation(label)}
+              onClick={() => navigate(`/${label.replace(' ', '')}`)}
             />
           ))}
           <SidebarButton
-            label="Lab result"
+            label="Lab Result"
             dropdownItems={["Generate Lab Result"]}
+            onDropdownItemClick={handleDropdownItemClick}
           />
           <SidebarButton
             label="Insurance"
             dropdownItems={["View Insurance Details"]}
+            onDropdownItemClick={() => {}}
           />
           <SidebarButton
             label="Sign Out"
-            onClick={() => handleNavigation("Sign Out")}
+            onClick={() => {
+              fetch("http://localhost:3001/endSession");
+              navigate("/"); // Navigate to home on sign out
+            }}
           />
         </Box>
       </Box>

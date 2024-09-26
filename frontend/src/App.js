@@ -20,6 +20,9 @@ import DocViewAppt from './DocViewAppt';
 import MakeDoc from './MakeDoc';
 import Diagnose from './Diagnose';
 import ShowDiagnoses from './ShowDiagnoses';
+import OrderLabTest from "./OrderLabTest";
+import Generatetestresult1 from "./Generatetestresult1";
+
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -54,6 +57,9 @@ export default function App() {
         <Route path="/DocSettings" element={<DocSettings />} />
         <Route path="/ApptList" element={<DocViewAppt />} />
         <Route path="*" element={<Navigate to="/" />} />
+        <Route path="/order-lab-test/:appointmentId" element={<OrderLabTest />} />
+        <Route path="/Generatetestresult1" element={<Generatetestresult1 />} />
+        
       </Routes>
     </Router>
   );
