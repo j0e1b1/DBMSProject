@@ -42,7 +42,7 @@ const LogIn = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
-    event.preventDefault();
+    event.preventDefault(); // Prevent the default form submission
     const formData = new FormData(event.target);
     const email = formData.get("email");
     const password = formData.get("password");
@@ -50,21 +50,31 @@ const LogIn = () => {
 
     try {
       const endpoint = isDoc
-        ? `http://localhost:3001/checkDoclogin?email=${email}&password=${password}`
-        : `http://localhost:3001/checklogin?email=${email}&password=${password}`;
+        ? `http://localhost:3001/checkDoclogin`
+        : `http://localhost:3001/checklogin`;
 
-      const response = await fetch(endpoint);
+      const response = await fetch(endpoint, {
+        method: 'POST', // Set the request method to POST
+        headers: {
+          'Content-Type': 'application/json', // Specify content type as JSON
+        },
+        body: JSON.stringify({ email, password }), // Send email and password in the body
+      });
+
       const data = await response.json();
 
-      if (data.data.length === 0) {
-        window.alert("Invalid Log In");
+      if (!response.ok || !data.data) {
+        window.alert("Invalid Log In"); // Show alert if login fails
       } else {
-        navigate(isDoc ? "/DocHome" : "/Home");
-        console.log(data.data);
+        // Store user data in local storage
+        localStorage.setItem('user', JSON.stringify({ email, who: isDoc ? 'doc' : 'pat' }));
+
+        navigate(isDoc ? "/DocHome" : "/Home"); // Navigate based on user type
+        console.log(data.data); // Optionally log user data
       }
     } catch (error) {
       console.error("Error logging in:", error);
-      window.alert("An error occurred while logging in.");
+      window.alert("An error occurred while logging in."); // Alert on error
     }
   };
 

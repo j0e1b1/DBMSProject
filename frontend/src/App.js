@@ -22,6 +22,9 @@ import Diagnose from './Diagnose';
 import ShowDiagnoses from './ShowDiagnoses';
 import OrderLabTest from "./OrderLabTest";
 import Generatetestresult1 from "./Generatetestresult1";
+import Viewlabresult from "./Viewlabresult";
+import LabResultDetail from "./LabResultDetail";
+
 
 
 export default function App() {
@@ -59,7 +62,8 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" />} />
         <Route path="/order-lab-test/:appointmentId" element={<OrderLabTest />} />
         <Route path="/Generatetestresult1" element={<Generatetestresult1 />} />
-        
+        <Route path="/Viewlabresult" element={<Viewlabresult/>} />
+        <Route path="/LabResultDetail/:testId" element={<LabResultDetail />} />
       </Routes>
     </Router>
   );

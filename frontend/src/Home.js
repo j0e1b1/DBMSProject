@@ -53,7 +53,7 @@ const SidebarButton = ({ label, onClick, dropdownItems }) => {
             <Button
               key={index}
               plain
-              onClick={() => {}}
+              onClick={() => onClick(item)} // Pass the dropdown item to onClick
             >
               {({ hover }) => (
                 <Box
@@ -83,6 +83,8 @@ const SidebarButtons = () => {
         navigate("/scheduleAppt");
         break;
       case "Sign Out":
+        // Clear user data from local storage
+        localStorage.removeItem('userData'); // Adjust the key based on your storage
         await fetch("http://localhost:3001/endSession");
         navigate("/");
         break;
@@ -101,6 +103,9 @@ const SidebarButtons = () => {
         break;
       case "Settings":
         navigate("/Settings");
+        break;
+      case "View Lab Test Results": // Added navigation for View Lab Test Results
+        navigate("/Viewlabresult");
         break;
       default:
         break;
@@ -125,7 +130,8 @@ const SidebarButtons = () => {
           />
           <SidebarButton
             label="Lab Test"
-            dropdownItems={["View Lab Test Results"]}
+            dropdownItems={["View Lab Test Results"]} // Update dropdown to trigger the ViewLabResult route
+            onClick={handleClick}
           />
           <SidebarButton
             label="Sign Out"

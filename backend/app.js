@@ -1,11 +1,13 @@
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
+
 //Logger that was used for debugging, commented later
 // var logger = require('morgan');
 var mysql = require('mysql2');
 var cors = require('cors');
 var port = 3001;
+
 
 // Connection Info
 var con = mysql.createConnection({
@@ -144,53 +146,61 @@ app.get('/makeDocAccount', (req, res) => {
   });
 });
 
-// Checks if patient is logged in
-app.get('/checklogin', (req, res) => {
-  let params = req.query;
-  let email = params.email;
-  let password = params.password;
-  let sql_statement = `SELECT * FROM Patient WHERE email = ? AND password = ?`;
+
+
+// Check if user is logged in (for patients)
+app.post('/checklogin', (req, res) => {
+  const { email, password } = req.body; // Get email and password from request body
+
+  const sql_statement = `SELECT * FROM Patient WHERE email = ? AND password = ?`;
   console.log(sql_statement);
-  con.query(sql_statement, [email, password], function (error, results, fields) {
+  
+  con.query(sql_statement, [email, password], function (error, results) {
     if (error) {
-      console.log("error");
-      return res.status(500).json({ failed: 'error occurred' });
+      console.error("Error occurred:", error);
+      return res.status(500).json({ message: 'Error occurred' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(401).json({ message: 'Invalid email or password' });
     } else {
-      if (results.length === 0) {
-        return res.json({ data: results });
-      } else {
-        email_in_use = email;
-        password_in_use = password;
-        who = "pat";
-        return res.json({ data: results });
-      }
+      // Store email and role (this should be handled securely, ideally using sessions or JWTs)
+      email_in_use = email;
+      password_in_use = password;
+      who = "pat";
+      return res.status(200).json({ data: results });
     }
   });
 });
-// Checks if doctor is logged in
-app.get('/checkDoclogin', (req, res) => {
-  const params = req.query;
-  const email = params.email;
-  const password = params.password;
-  const sql_statement = `SELECT * FROM Doctor WHERE email="${email}" AND password="${password}"`;
+
+// Check if doctor is logged in
+app.post('/checkDoclogin', (req, res) => {
+  const { email, password } = req.body; // Get email and password from request body
+
+  const sql_statement = `SELECT * FROM Doctor WHERE email = ? AND password = ?`;
   console.log(sql_statement);
-  con.query(sql_statement, (error, results) => {
+  
+  con.query(sql_statement, [email, password], (error, results) => {
     if (error) {
-      console.log("error");
-      return res.status(500).json({ failed: 'error occurred' });
+      console.error("Error occurred:", error);
+      return res.status(500).json({ message: 'Error occurred' });
+    }
+    
+    if (results.length === 0) {
+      return res.status(401).json({ message: 'Invalid email or password' });
     } else {
-      if (results.length === 0) {
-      } else {
-        email_in_use = results[0].email;
-        password_in_use = results[0].password;
-        who = "doc";
-        console.log(email_in_use);
-        console.log(password_in_use);
-      }
-      res.json({ data: results });
+      // Store email and role (this should be handled securely, ideally using sessions or JWTs)
+      email_in_use = results[0].email;
+      password_in_use = results[0].password;
+      who = "doc";
+      console.log(email_in_use);
+      console.log(password_in_use);
+      return res.status(200).json({ data: results });
     }
   });
 });
+
+
 
 // Resets Patient Password
 app.post('/resetPasswordPatient', (req, res) => {
@@ -460,22 +470,42 @@ app.get('/genApptUID', (req, res) => {
   });
 });
 
-// To fill diagnoses
-app.get('/diagnose', (req, res) => {
-  const { id, diagnosis, prescription } = req.query;
-  const statement = `UPDATE Diagnose SET diagnosis=?, prescription=? WHERE appt=?`;
-  console.log(statement);
-  con.query(statement, [diagnosis, prescription, id], (error, results) => {
-    if (error) throw error;
-    else {
-      const statement = `UPDATE Appointment SET status='Done' WHERE id=?`;
-      console.log(statement);
-      con.query(statement, [id], (error, results) => {
-        if (error) throw error;
-      });
+app.post('/Diagnose', (req, res) => {
+  const { id, diagnosis, prescription } = req.body;
+
+  // Validate input
+  if (!id || !diagnosis || !prescription) {
+    return res.status(400).json({ error: "Missing required fields." });
+  }
+
+  // Prepare the SQL statement to update the Diagnose table
+  const updateDiagnoseStatement = `UPDATE Diagnose SET diagnosis=?, prescription=? WHERE appt=?`;
+  console.log(updateDiagnoseStatement);
+
+  // Execute the first SQL statement
+  con.query(updateDiagnoseStatement, [diagnosis, prescription, id], (error, results) => {
+    if (error) {
+      console.error("Error updating Diagnose:", error);
+      return res.status(500).json({ error: "Error updating diagnosis." });
     }
+
+    // Prepare the second SQL statement to update the Appointment table
+    const updateAppointmentStatement = `UPDATE Appointment SET status='Done' WHERE id=?`;
+    console.log(updateAppointmentStatement);
+
+    // Execute the second SQL statement
+    con.query(updateAppointmentStatement, [id], (error, results) => {
+      if (error) {
+        console.error("Error updating Appointment:", error);
+        return res.status(500).json({ error: "Error updating appointment status." });
+      }
+
+      // Successfully updated both tables
+      return res.status(200).json({ message: "Diagnosis and appointment status updated successfully." });
+    });
   });
 });
+
 
 // To show diagnoses
 app.get('/showDiagnoses', (req, res) => {
@@ -597,6 +627,69 @@ app.post('/generate-test-result', async (req, res) => {
   }
 });
 
+
+app.get('/view-lab-results', (req, res) => {
+  const { email } = req.query; // Get email from query parameters
+
+  // Log the obtained email for debugging purposes
+  console.log('Email obtained from query:', email);
+
+  if (!email) {
+    return res.status(401).json({ message: 'Unauthorized: Please provide an email' });
+  }
+
+  const labResultQuery = `
+    SELECT lt.id, lt.name, lt.date, lt.result, lt.appointment_id
+    FROM labtest lt
+    INNER JOIN patientsattendappointments pa ON lt.appointment_id = pa.appt
+    WHERE pa.patient = ?;
+  `;
+
+  console.log('Lab result query:', labResultQuery); // Log the query for debugging
+
+  con.query(labResultQuery, [email], (error, results) => {
+    if (error) {
+      console.error('Error fetching lab results:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    } else {
+      if (results.length > 0) {
+        return res.json({ data: results }); // Send the fetched lab results as JSON
+      } else {
+        return res.status(404).json({ message: 'No lab results found for this patient' });
+      }
+    }
+  });
+});
+
+// Route to fetch details of a specific lab test by ID
+app.get('/view-lab-result/:id', (req, res) => {
+  const testId = req.params.id; // Get the test ID from the URL parameters
+
+  // Query to select the specific lab test result by ID
+  const labResultQuery = `
+    SELECT lt.id, lt.name, lt.date, lt.result, lt.appointment_id
+    FROM labtest lt
+    WHERE lt.id = ?; -- Use prepared statement for security
+  `;
+
+  // Log the query for debugging
+  console.log('Lab result query:', labResultQuery);
+
+  con.query(labResultQuery, [testId], (error, results) => {
+    if (error) {
+      console.error('Error fetching lab result:', error);
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+    
+    if (results.length > 0) {
+      // Optional: Format the date before sending
+      results[0].date = new Date(results[0].date).toLocaleString(); // Format as needed
+      return res.json({ data: results[0] }); // Send the fetched lab result as JSON
+    } else {
+      return res.status(404).json({ message: 'Lab result not found' });
+    }
+  });
+});
 
 
 
