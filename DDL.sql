@@ -1,6 +1,6 @@
--- Table `hms1`.`appointment`
+-- Table `hms`.`appointment`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`appointment` (
+CREATE TABLE IF NOT EXISTS `hms`.`appointment` (
   `id` INT NOT NULL,
   `date` DATE NOT NULL,
   `starttime` TIME NOT NULL,
@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS `hms1`.`appointment` (
 -- -----------------------------------------------------
 -- Table `mydb`.`Lab Test`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`LabTest` (
+CREATE TABLE IF NOT EXISTS `hms`.`LabTest` (
   `Id` INT NOT NULL,
   `name` VARCHAR(30) NULL,
   `Date` DATE NULL,
@@ -21,15 +21,15 @@ CREATE TABLE IF NOT EXISTS `hms1`.`LabTest` (
   INDEX `fk_Lab Test_appointment1_idx` (`appointment_id` ASC) ,
   CONSTRAINT `fk_Lab Test_appointment1`
     FOREIGN KEY (`appointment_id`)
-    REFERENCES `hms1`.`appointment` (`id`)
+    REFERENCES `hms`.`appointment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION);
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`patient`
+-- Table `hms`.`patient`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`patient` (
+CREATE TABLE IF NOT EXISTS `hms`.`patient` (
   `email` VARCHAR(50) NOT NULL,
   `password` VARCHAR(30) NOT NULL,
   `name` VARCHAR(50) NOT NULL,
@@ -39,9 +39,9 @@ CREATE TABLE IF NOT EXISTS `hms1`.`patient` (
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`Insurance`
+-- Table `hms`.`Insurance`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`Insurance` (
+CREATE TABLE IF NOT EXISTS `hms`.`Insurance` (
   `Policy_number` VARCHAR(20) NOT NULL,
   `provider` VARCHAR(30) NULL,
   `coverage_amount` DECIMAL NULL,
@@ -50,15 +50,15 @@ CREATE TABLE IF NOT EXISTS `hms1`.`Insurance` (
   INDEX `fk_Insurance_patient1_idx` (`patient_email` ASC) ,
   CONSTRAINT `fk_Insurance_patient1`
     FOREIGN KEY (`patient_email`)
-    REFERENCES `hms1`.`patient` (`email`)
+    REFERENCES `hms`.`patient` (`email`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`Bill`
+-- Table `hms`.`Bill`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`Bill` (
+CREATE TABLE IF NOT EXISTS `hms`.`Bill` (
   `id` INT NOT NULL,
   `amount` DECIMAL NULL,
   `date` DATE NULL,
@@ -72,26 +72,26 @@ CREATE TABLE IF NOT EXISTS `hms1`.`Bill` (
   INDEX `fk_Bill_Insurance1_idx` (`Insurance_Policy_number` ASC) ,
   CONSTRAINT `fk_Bill_patient1`
     FOREIGN KEY (`patient_email`)
-    REFERENCES `hms1`.`patient` (`email`)
+    REFERENCES `hms`.`patient` (`email`)
     ON DELETE NO ACTION
     ON UPDATE CASCADE,
   CONSTRAINT `fk_Bill_appointment1`
     FOREIGN KEY (`appointment_id`)
-    REFERENCES `hms1`.`appointment` (`id`)
+    REFERENCES `hms`.`appointment` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Bill_Insurance1`
     FOREIGN KEY (`Insurance_Policy_number`)
-    REFERENCES `hms1`.`Insurance` (`Policy_number`)
+    REFERENCES `hms`.`Insurance` (`Policy_number`)
     ON DELETE NO ACTION
     ON UPDATE CASCADE);
 
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`doctor`
+-- Table `hms`.`doctor`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`doctor` (
+CREATE TABLE IF NOT EXISTS `hms`.`doctor` (
   `email` VARCHAR(50) NOT NULL,
   `gender` VARCHAR(20) NOT NULL,
   `password` VARCHAR(30) NOT NULL,
@@ -101,9 +101,9 @@ CREATE TABLE IF NOT EXISTS `hms1`.`doctor` (
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`diagnose`
+-- Table `hms`.`diagnose`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`diagnose` (
+CREATE TABLE IF NOT EXISTS `hms`.`diagnose` (
   `appt` INT NOT NULL,
   `doctor` VARCHAR(50) NOT NULL,
   `diagnosis` VARCHAR(40) NOT NULL,
@@ -112,21 +112,21 @@ CREATE TABLE IF NOT EXISTS `hms1`.`diagnose` (
   INDEX `doctor` (`doctor` ASC) ,
   CONSTRAINT `diagnose_ibfk_1`
     FOREIGN KEY (`appt`)
-    REFERENCES `hms1`.`appointment` (`id`)
+    REFERENCES `hms`.`appointment` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `diagnose_ibfk_2`
     FOREIGN KEY (`doctor`)
-    REFERENCES `hms1`.`doctor` (`email`)
+    REFERENCES `hms`.`doctor` (`email`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`schedule`
+-- Table `hms`.`schedule`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`schedule` (
+CREATE TABLE IF NOT EXISTS `hms`.`schedule` (
   `id` INT NOT NULL,
   `starttime` TIME NOT NULL,
   `endtime` TIME NOT NULL,
@@ -136,29 +136,29 @@ CREATE TABLE IF NOT EXISTS `hms1`.`schedule` (
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`docshaveschedules`
+-- Table `hms`.`docshaveschedules`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`docshaveschedules` (
+CREATE TABLE IF NOT EXISTS `hms`.`docshaveschedules` (
   `sched` INT NOT NULL,
   `doctor` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`sched`, `doctor`),
   INDEX `doctor` (`doctor` ASC) ,
   CONSTRAINT `docshaveschedules_ibfk_1`
     FOREIGN KEY (`sched`)
-    REFERENCES `hms1`.`schedule` (`id`)
+    REFERENCES `hms`.`schedule` (`id`)
     ON DELETE CASCADE,
   CONSTRAINT `docshaveschedules_ibfk_2`
     FOREIGN KEY (`doctor`)
-    REFERENCES `hms1`.`doctor` (`email`)
+    REFERENCES `hms`.`doctor` (`email`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`medicalhistory`
+-- Table `hms`.`medicalhistory`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`medicalhistory` (
+CREATE TABLE IF NOT EXISTS `hms`.`medicalhistory` (
   `id` INT NOT NULL,
   `date` DATE NOT NULL,
   `conditions` VARCHAR(100) NOT NULL,
@@ -168,29 +168,29 @@ CREATE TABLE IF NOT EXISTS `hms1`.`medicalhistory` (
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`doctorviewshistory`
+-- Table `hms`.`doctorviewshistory`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`doctorviewshistory` (
+CREATE TABLE IF NOT EXISTS `hms`.`doctorviewshistory` (
   `history` INT NOT NULL,
   `doctor` VARCHAR(50) NOT NULL,
   PRIMARY KEY (`history`, `doctor`),
   INDEX `doctor` (`doctor` ASC) ,
   CONSTRAINT `doctorviewshistory_ibfk_1`
     FOREIGN KEY (`doctor`)
-    REFERENCES `hms1`.`doctor` (`email`)
+    REFERENCES `hms`.`doctor` (`email`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `doctorviewshistory_ibfk_2`
     FOREIGN KEY (`history`)
-    REFERENCES `hms1`.`medicalhistory` (`id`)
+    REFERENCES `hms`.`medicalhistory` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
 
 
 -- -----------------------------------------------------
--- Table `hms1`.`patientsattendappointments`
+-- Table `hms`.`patientsattendappointments`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`patientsattendappointments` (
+CREATE TABLE IF NOT EXISTS `hms`.`patientsattendappointments` (
   `patient` VARCHAR(50) NOT NULL,
   `appt` INT NOT NULL,
   `concerns` VARCHAR(40) NOT NULL,
@@ -199,30 +199,30 @@ CREATE TABLE IF NOT EXISTS `hms1`.`patientsattendappointments` (
   
   CONSTRAINT `patientsattendappointments_ibfk_1`
     FOREIGN KEY (`patient`)
-    REFERENCES `hms1`.`patient` (`email`)
+    REFERENCES `hms`.`patient` (`email`)
     ON DELETE CASCADE,
   CONSTRAINT `patientsattendappointments_ibfk_2`
     FOREIGN KEY (`appt`)
-    REFERENCES `hms1`.`appointment` (`id`)
+    REFERENCES `hms`.`appointment` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
 
 -- -----------------------------------------------------
--- Table `hms1`.`patientsfillhistory`
+-- Table `hms`.`patientsfillhistory`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `hms1`.`patientsfillhistory` (
+CREATE TABLE IF NOT EXISTS `hms`.`patientsfillhistory` (
   `patient` VARCHAR(50) NOT NULL,
   `history` INT NOT NULL,
   PRIMARY KEY (`history`),
   INDEX `patient` (`patient` ASC) ,
   CONSTRAINT `patientsfillhistory_ibfk_1`
     FOREIGN KEY (`patient`)
-    REFERENCES `hms1`.`patient` (`email`)
+    REFERENCES `hms`.`patient` (`email`)
     ON DELETE CASCADE
     ON UPDATE CASCADE,
   CONSTRAINT `patientsfillhistory_ibfk_2`
     FOREIGN KEY (`history`)
-    REFERENCES `hms1`.`medicalhistory` (`id`)
+    REFERENCES `hms`.`medicalhistory` (`id`)
     ON DELETE CASCADE
     ON UPDATE CASCADE);
