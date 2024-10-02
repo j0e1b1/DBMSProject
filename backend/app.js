@@ -14,7 +14,7 @@ var con = mysql.createConnection({
   host: 'localhost',
   user: 'rick',
   password: '123456',
-  database: 'HMS',
+  database: 'hms',
   multipleStatements: true
 });
 
@@ -236,9 +236,14 @@ app.post('/resetPasswordDoctor', (req, res) => {
 
 // Returns Who is Logged in
 app.get('/userInSession', (req, res) => {
+  console.log("Current email in use:", email_in_use); // Check if this gets logged
+
+  if (!email_in_use) {
+    return res.status(404).json({ message: "No user in session" });
+  }
+
   res.json({ email: `${email_in_use}`, who: `${who}` });
 });
-
 // Logs the person out
 app.get('/endSession', (req, res) => {
   console.log("Ending session");

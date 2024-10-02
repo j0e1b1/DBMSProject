@@ -94,10 +94,10 @@ VALUES
 (204,'bajaj',800000,'ramesh@gmail.com')
 ;
 
-INSERT INTO bill(id,amount,date,status,patient_email,appointment_id,policy_no)
+INSERT INTO bill(id,amount,date,status,patient_email,appointment_id)
 VALUES
-(200,2000,'2019-01-18','completed','suresh@gmail.com',3,203),
-(202,3000,'2024-08-16','completed','rakesh@gmail.com',4,202),
-(204,3500,'2024-08-07','not done','rakesh@gmail.com',6,202)
+(200,2000,'2019-01-18','completed','suresh@gmail.com',3),
+(202,3000,'2024-08-16','completed','rakesh@gmail.com',4),
+(204,3500,'2024-08-07','not done','rakesh@gmail.com',6)
 ;
 
