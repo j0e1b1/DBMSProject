@@ -237,38 +237,52 @@ const SchedulingAppt = () => {
   const [symptoms, setSymptoms] = useState("");
   const [doctor, setDoctor] = useState("");
   const [showViewBill, setShowViewBill] = useState(false);
-
   const handleSubmit = (event) => {
     event.preventDefault();
+  
+    // Retrieve email from local storage
+    const storedUser = localStorage.getItem('user');
+    if (!storedUser) {
+      window.alert("User is not logged in!");
+      return;
+    }
+  
+    const user = JSON.parse(storedUser);
+    const currentUserEmail = user.email;
+  
+    // Check if email is available
+    if (!currentUserEmail) {
+      window.alert("No email found in local storage!");
+      return;
+    }
 
-    fetch("http://localhost:3001/userInSession")
+    // Check if an appointment already exists
+    fetch(`http://localhost:3001/checkIfApptExists?email=${currentUserEmail}&startTime=${time}&date=${date}&docEmail=${doctor}`)
       .then(res => res.json())
       .then(res => {
-        const email_in_use = res.email;
-        fetch(`http://localhost:3001/checkIfApptExists?email=${email_in_use}&startTime=${time}&date=${date}&docEmail=${doctor}`)
-          .then(res => res.json())
-          .then(res => {
-            if (res.data[0]) {
-              window.alert("Appointment Clash! Try another doctor or date/time");
-            } else {
-              fetch("http://localhost:3001/genApptUID")
-                .then(res => res.json())
-                .then(res => {
-                  const gen_uid = res.id;
-                  fetch(`http://localhost:3001/schedule?time=${time}&endTime=${endTime}&date=${date}&concerns=${concerns}&symptoms=${symptoms}&id=${gen_uid}&doc=${doctor}`)
+        if (res.data[0]) {
+          window.alert("Appointment Clash! Try another doctor or date/time");
+        } else {
+          // Generate a unique appointment ID
+          fetch("http://localhost:3001/genApptUID")
+            .then(res => res.json())
+            .then(res => {
+              const gen_uid = res.id;
+
+              // Schedule the appointment
+              fetch(`http://localhost:3001/schedule?time=${time}&endTime=${endTime}&date=${date}&concerns=${concerns}&symptoms=${symptoms}&id=${gen_uid}&doc=${doctor}`)
+                .then(() => {
+                  // Add the appointment to the patient's records
+                  fetch(`http://localhost:3001/addToPatientSeeAppt?email=${currentUserEmail}&id=${gen_uid}&concerns=${concerns}&symptoms=${symptoms}`)
                     .then(() => {
-                      fetch(`http://localhost:3001/addToPatientSeeAppt?email=${email_in_use}&id=${gen_uid}&concerns=${concerns}&symptoms=${symptoms}`)
-                        .then(() => {
-                          window.alert("Appointment successfully scheduled!");
-                          setShowViewBill(true); // Show the "View Bill" button
-                        });
+                      window.alert("Appointment successfully scheduled!");
+                      setShowViewBill(true); // Show the "View Bill" button
                     });
                 });
-            }
-          });
+            });
+        }
       });
   };
-
   return (
     <Grommet theme={theme} full>
       <AppBar>
