@@ -69,21 +69,7 @@ const LogIn = () => {
         // Store user data in local storage
         localStorage.setItem('user', JSON.stringify({ email, who: isDoc ? 'doc' : 'pat' }));
 
-        // Call userInSession endpoint after successful login
-        const userInSessionResponse = await fetch('http://localhost:3001/userInSession', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (userInSessionResponse.ok) {
-          const userSessionData = await userInSessionResponse.json();
-          console.log('User in session:', userSessionData); // Log user session data
-        } else {
-          console.error('Error fetching user in session:', userInSessionResponse.status);
-        }
-
+        // Navigate based on user type
         navigate(isDoc ? "/DocHome" : "/Home"); // Navigate based on user type
         console.log(data.data); // Optionally log user data
       }

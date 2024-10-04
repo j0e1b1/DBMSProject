@@ -83,8 +83,7 @@ const SidebarButtons = () => {
         navigate("/scheduleAppt");
         break;
       case "Sign Out":
-        // Clear user data from local storage
-        localStorage.removeItem('userData'); // Adjust the key based on your storage
+        localStorage.removeItem('userData');
         await fetch("http://localhost:3001/endSession");
         navigate("/");
         break;
@@ -104,44 +103,55 @@ const SidebarButtons = () => {
       case "Settings":
         navigate("/Settings");
         break;
-      case "View Lab Test Results": // Added navigation for View Lab Test Results
+      case "View Lab Test":
         navigate("/Viewlabresult");
         break;
-      default:
-        break;
-    }
-  };
-
-  return (
-    <Grommet full theme={theme}>
-      <Box fill direction="row">
-        <Box background="brand">
-          {["View Medical History", "View Appointments", "Schedule Appointment", "Settings"].map(label => (
-            <SidebarButton
-              key={label}
-              label={label}
-              active={label === active}
-              onClick={() => handleClick(label)}
-            />
-          ))}
-          <SidebarButton
-            label="Insurance"
-            dropdownItems={["Add Insurance", "Update Insurance", "View Insurance"]}
-          />
-          <SidebarButton
-            label="Lab Test"
-            dropdownItems={["View Lab Test Results"]} // Update dropdown to trigger the ViewLabResult route
-            onClick={handleClick}
-          />
-          <SidebarButton
-            label="Sign Out"
-            onClick={() => handleClick("Sign Out")}
-          />
-        </Box>
-      </Box>
-    </Grommet>
-  );
+    case "Add Insurance": // Handle Add Insurance navigation
+      navigate("/addInsurance");
+      break;
+    case "Update Insurance": // Optionally handle other dropdown items
+      navigate("/updateInsurance");
+      break;
+    case "View Insurance":
+      navigate("/viewInsurance");
+      break;
+    default:
+      break;
+  }
 };
+
+return (
+  <Grommet full theme={theme}>
+    <Box fill direction="row">
+      <Box background="brand">
+        {["View Medical History", "View Appointments", "Schedule Appointment", "Settings"].map(label => (
+          <SidebarButton
+            key={label}
+            label={label}
+            active={label === active}
+            onClick={() => handleClick(label)}
+          />
+        ))}
+        <SidebarButton
+          label="Insurance"
+          dropdownItems={["Add Insurance", "Update Insurance", "View Insurance"]}
+          onClick={handleClick} // Pass handleClick to manage dropdown selection
+        />
+        <SidebarButton
+          label="Lab Test"
+          dropdownItems={["View Lab Test Results"]}
+          onClick={handleClick}
+        />
+        <SidebarButton
+          label="Sign Out"
+          onClick={() => handleClick("Sign Out")}
+        />
+      </Box>
+    </Box>
+  </Grommet>
+);
+};
+
 
 const Home = () => {
   const Header = () => (

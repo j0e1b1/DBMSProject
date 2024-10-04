@@ -1,5 +1,5 @@
 var createError = require('http-errors');
-var express = require('express');
+
 var path = require('path');
 
 //Logger that was used for debugging, commented later
@@ -7,7 +7,11 @@ var path = require('path');
 var mysql = require('mysql2');
 var cors = require('cors');
 var port = 3001;
+const express = require('express');
+const bodyParser = require('body-parser');
 
+const app1 = express();
+app1.use(bodyParser.json()); // Middleware to parse JSON body
 
 // Connection Info
 var con = mysql.createConnection({
@@ -707,6 +711,33 @@ app.get('/view-lab-result/:id', (req, res) => {
       return res.status(404).json({ message: 'Lab result not found' });
     }
   });
+});
+
+// Route to add insurance details
+app.post('/addInsurance1', (req, res) => {
+  const { Policy_number, provider, coverage_amount, patient_email } = req.body;
+
+  if (!Policy_number || !provider || !coverage_amount || !patient_email) {
+    return res.status(400).send('All fields are required.');
+  }
+
+  const query = `
+    INSERT INTO insurance (Policy_number, provider, coverage_amount, patient_email)
+    VALUES (?, ?, ?, ?)
+  `;
+
+  con.query(
+    query,
+    [Policy_number, provider, coverage_amount, patient_email],
+    (err, result) => {
+      if (err) {
+        console.error('Error inserting insurance data:', err);
+        return res.status(500).send('Error inserting insurance data.');
+      }
+
+      res.status(200).send('Insurance details added successfully.');
+    }
+  );
 });
 
 

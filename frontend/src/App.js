@@ -24,6 +24,7 @@ import OrderLabTest from "./OrderLabTest";
 import Generatetestresult1 from "./Generatetestresult1";
 import Viewlabresult from "./Viewlabresult";
 import LabResultDetail from "./LabResultDetail";
+import AddInsurance from "./addInsurance"
 
 
 
@@ -64,6 +65,7 @@ export default function App() {
         <Route path="/Generatetestresult1" element={<Generatetestresult1 />} />
         <Route path="/Viewlabresult" element={<Viewlabresult/>} />
         <Route path="/LabResultDetail/:testId" element={<LabResultDetail />} />
+        <Route path="/addInsurance" element={<AddInsurance />} />
       </Routes>
     </Router>
   );
