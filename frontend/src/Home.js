@@ -1,23 +1,16 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Button,
-  Heading,
-  Grommet,
-  Text,
-  Grid
-} from 'grommet';
-import { useNavigate } from 'react-router-dom'; // Use for navigation
-import './App.css';
+import React, { useState } from "react";
+import { Box, Button, Heading, Grommet, Text, Grid } from "grommet";
+import { useNavigate } from "react-router-dom"; // Use for navigation
+import "./App.css";
 
 const theme = {
   global: {
     colors: {
-      brand: '#000000',
-      focus: '#000000'
+      brand: "#000000",
+      focus: "#000000",
     },
     font: {
-      family: 'Lato',
+      family: "Lato",
     },
   },
 };
@@ -29,7 +22,10 @@ const SidebarButton = ({ label, onClick, dropdownItems }) => {
     <Box>
       <Button
         plain
-        onClick={onClick}
+        onClick={(event) => {
+          event.preventDefault(); // Prevent default behavior
+          onClick(label); // Call the onClick function passed as a prop
+        }}
         onMouseEnter={() => setShowDropdown(true)}
         onMouseLeave={() => setShowDropdown(false)}
       >
@@ -53,7 +49,10 @@ const SidebarButton = ({ label, onClick, dropdownItems }) => {
             <Button
               key={index}
               plain
-              onClick={() => onClick(item)} // Pass the dropdown item to onClick
+              onClick={(event) => {
+                event.preventDefault(); // Prevent default behavior
+                onClick(item); // Call the onClick function for dropdown items
+              }}
             >
               {({ hover }) => (
                 <Box
@@ -72,7 +71,7 @@ const SidebarButton = ({ label, onClick, dropdownItems }) => {
 };
 
 const SidebarButtons = () => {
-  const [active, setActive] = useState('');
+  const [active, setActive] = useState("");
   const navigate = useNavigate();
 
   const handleClick = async (label) => {
@@ -83,7 +82,7 @@ const SidebarButtons = () => {
         navigate("/scheduleAppt");
         break;
       case "Sign Out":
-        localStorage.removeItem('userData');
+        localStorage.removeItem("userData");
         await fetch("http://localhost:3001/endSession");
         navigate("/");
         break;
@@ -97,7 +96,7 @@ const SidebarButtons = () => {
           const email_in_use = data.email;
           navigate(`/ViewOneHistory/${encodeURIComponent(email_in_use)}`);
         } catch (error) {
-          console.error('Error fetching user session:', error);
+          console.error("Error fetching user session:", error);
         }
         break;
       case "Settings":
@@ -106,68 +105,78 @@ const SidebarButtons = () => {
       case "View Lab Test":
         navigate("/Viewlabresult");
         break;
-    case "Add Insurance": // Handle Add Insurance navigation
-      navigate("/addInsurance");
-      break;
-    case "Update Insurance": // Optionally handle other dropdown items
-      navigate("/updateInsurance");
-      break;
-    case "View Insurance":
-      navigate("/viewInsurance");
-      break;
-    default:
-      break;
-  }
-};
+      case "Add Insurance": // Handle Add Insurance navigation
+        navigate("/addInsurance");
+        break;
+      case "Update Insurance": // Optionally handle other dropdown items
+        navigate("/updateInsurance");
+        break;
+      case "View Insurance":
+        navigate("/ViewInsurance");
+        break;
+      default:
+        break;
+    }
+  };
 
-return (
-  <Grommet full theme={theme}>
-    <Box fill direction="row">
-      <Box background="brand">
-        {["View Medical History", "View Appointments", "Schedule Appointment", "Settings"].map(label => (
+  return (
+    <Grommet full theme={theme}>
+      <Box fill direction="row">
+        <Box background="brand">
+          {[
+            "View Medical History",
+            "View Appointments",
+            "Schedule Appointment",
+            "Settings",
+          ].map((label) => (
+            <SidebarButton
+              key={label}
+              label={label}
+              active={label === active}
+              onClick={() => handleClick(label)}
+            />
+          ))}
           <SidebarButton
-            key={label}
-            label={label}
-            active={label === active}
-            onClick={() => handleClick(label)}
+            label="Insurance"
+            dropdownItems={[
+              "Add Insurance",
+              "Update Insurance",
+              "View Insurance",
+            ]}
+            onClick={handleClick} // Pass handleClick to manage dropdown selection
           />
-        ))}
-        <SidebarButton
-          label="Insurance"
-          dropdownItems={["Add Insurance", "Update Insurance", "View Insurance"]}
-          onClick={handleClick} // Pass handleClick to manage dropdown selection
-        />
-        <SidebarButton
-          label="Lab Test"
-          dropdownItems={["View Lab Test Results"]}
-          onClick={handleClick}
-        />
-        <SidebarButton
-          label="Sign Out"
-          onClick={() => handleClick("Sign Out")}
-        />
+          <SidebarButton
+            label="Lab Test"
+            dropdownItems={["View Lab Test Results"]}
+            onClick={handleClick}
+          />
+          <SidebarButton
+            label="Sign Out"
+            onClick={() => handleClick("Sign Out")}
+          />
+        </Box>
       </Box>
-    </Box>
-  </Grommet>
-);
+    </Grommet>
+  );
 };
-
 
 const Home = () => {
   const Header = () => (
     <Box
-      tag='header'
-      background='brand'
-      pad='small'
-      elevation='small'
-      justify='between'
-      direction='row'
-      align='center'
+      tag="header"
+      background="brand"
+      pad="small"
+      elevation="small"
+      justify="between"
+      direction="row"
+      align="center"
       flex={false}
       style={{ borderBottom: "1px solid grey" }}
     >
-      <a style={{ color: 'inherit', textDecoration: 'inherit' }} href="/">
-        <Heading level='3' margin='none'>HMS</Heading>
+      <a style={{ color: "inherit", textDecoration: "inherit" }} href=" ">
+        <Heading level="3" margin="none">
+          HMS
+        </Heading>
       </a>
     </Box>
   );
@@ -178,28 +187,24 @@ const Home = () => {
         <Header />
         <Grid
           fill
-          rows={['auto', 'flex']}
-          columns={['auto', 'flex']}
+          rows={["auto", "flex"]}
+          columns={["auto", "flex"]}
           areas={[
-            { name: 'sidebar', start: [0, 1], end: [0, 1] },
-            { name: 'main', start: [1, 1], end: [1, 1] },
+            { name: "sidebar", start: [0, 1], end: [0, 1] },
+            { name: "main", start: [1, 1], end: [1, 1] },
           ]}
         >
           <Box
             gridArea="sidebar"
             width="small"
             animation={[
-              { type: 'fadeIn', duration: 300 },
-              { type: 'slideRight', size: 'xlarge', duration: 150 },
+              { type: "fadeIn", duration: 300 },
+              { type: "slideRight", size: "xlarge", duration: 150 },
             ]}
           >
             <SidebarButtons />
           </Box>
-          <Box
-            gridArea="main"
-            justify="top"
-            align="center"
-          >
+          <Box gridArea="main" justify="top" align="center">
             <Box align="center" pad="large">
               <Heading color="#000000">Welcome Patient</Heading>
             </Box>

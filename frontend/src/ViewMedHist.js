@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Button,
@@ -11,41 +11,43 @@ import {
   TableRow,
   TableCell,
   TableBody,
-} from 'grommet';
-import { useNavigate } from 'react-router-dom';
-import './App.css';
+} from "grommet";
+import { useNavigate } from "react-router-dom";
+import "./App.css";
 
 const theme = {
   global: {
     colors: {
-      brand: '#000000',
-      focus: '#000000',
+      brand: "#000000",
+      focus: "#000000",
     },
     font: {
-      family: 'Lato',
+      family: "Lato",
     },
   },
 };
 
 const ViewMedHist = () => {
   const [medHistState, setMedHistState] = useState([]);
-  const [searchValue, setSearchValue] = useState('');
+  const [searchValue, setSearchValue] = useState("");
   const navigate = useNavigate();
 
   const fetchMedHist = async (value) => {
     try {
-      const response = await fetch(`http://localhost:3001/MedHistView?name=${value}`);
-      if (!response.ok) throw new Error('Network response was not ok');
+      const response = await fetch(
+        `http://localhost:3001/MedHistView?name=${value}`,
+      );
+      if (!response.ok) throw new Error("Network response was not ok");
       const data = await response.json();
       setMedHistState(data.data || []);
     } catch (error) {
-      console.error('Error fetching medical history:', error);
-      window.alert('An error occurred while fetching medical history.');
+      console.error("Error fetching medical history:", error);
+      window.alert("An error occurred while fetching medical history.");
     }
   };
 
   useEffect(() => {
-    fetchMedHist('');
+    fetchMedHist("");
   }, []);
 
   const handleSearch = (event) => {
@@ -64,7 +66,7 @@ const ViewMedHist = () => {
       align="center"
       flex={false}
     >
-      <a style={{ color: 'inherit', textDecoration: 'inherit' }} href="/">
+      <a style={{ color: "inherit", textDecoration: "inherit" }} href="/">
         <Heading level="3" margin="none">
           HMS
         </Heading>
@@ -109,7 +111,7 @@ const ViewMedHist = () => {
       <Header />
       <Box fill align="center" pad="medium">
         <Form onSubmit={handleSearch}>
-          <Heading level="4" textAlign="center" margin={{ bottom: 'small' }}>
+          <Heading level="4" textAlign="center" margin={{ bottom: "small" }}>
             Search By Name
           </Heading>
           <FormField
@@ -118,7 +120,7 @@ const ViewMedHist = () => {
             onChange={(event) => setSearchValue(event.target.value)}
             placeholder="Enter name"
           />
-          <Box direction="row" justify="center" margin={{ top: 'small' }}>
+          <Box direction="row" justify="center" margin={{ top: "small" }}>
             <Button type="submit" primary label="Submit" />
           </Box>
         </Form>

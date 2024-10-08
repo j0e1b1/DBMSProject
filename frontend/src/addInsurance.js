@@ -1,25 +1,47 @@
-import React, { useState } from 'react';
-import { Box, Button, Form, FormField, TextInput, Grommet, Heading } from 'grommet';
+import React, { useState } from "react";
+import {
+  Box,
+  Button,
+  Form,
+  FormField,
+  TextInput,
+  Grommet,
+  Heading,
+  Text,
+} from "grommet";
 
 const theme = {
   global: {
     colors: {
-      brand: '#000000', // Similar theme color as in OrderLabTest
+      brand: "#000000",
     },
     font: {
-      family: 'Lato',
+      family: "Lato",
     },
   },
 };
 
+const AppBar = (props) => (
+  <Box
+    tag="header"
+    direction="row"
+    align="center"
+    justify="between"
+    background="brand"
+    pad={{ left: "medium", right: "small", vertical: "small" }}
+    style={{ zIndex: "1" }}
+    {...props}
+  />
+);
+
 const AddInsurance = () => {
   const [formValues, setFormValues] = useState({
-    Policy_number: '',
-    provider: '',
-    coverage_amount: '',
-    patient_email: '',
+    Policy_number: "",
+    provider: "",
+    coverage_amount: "",
   });
-  const [submittedData, setSubmittedData] = useState(null); // To track submitted data
+  const [submittedData, setSubmittedData] = useState(null);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleChange = (field) => (event) => {
     setFormValues({
@@ -29,94 +51,111 @@ const AddInsurance = () => {
   };
 
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission
-  
+    event.preventDefault();
+
+    let email_in_use;
     try {
-      const sentData = JSON.stringify(formValues, null, 2); // Format data for console
-      console.log('Data sent to backend:', sentData); // Log sent data
-  
-      const response = await fetch('http://localhost:3001/addInsurance1', {
-        method: 'POST',
+      const res = await fetch("http://localhost:3001/userInSession");
+      const data = await res.json();
+      email_in_use = data.email;
+    } catch (error) {
+      console.error("Error fetching user session:", error);
+      return;
+    }
+
+    const dataToSubmit = {
+      ...formValues,
+      patient_email: email_in_use,
+    };
+
+    try {
+      const sentData = JSON.stringify(dataToSubmit, null, 2);
+      console.log("Data sent to backend:", sentData);
+
+      const response = await fetch("http://localhost:3001/addInsurance1", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(formValues), // Send form data as JSON
+        body: JSON.stringify(dataToSubmit),
       });
-  
-      // Check if the response content-type is JSON
-      const contentType = response.headers.get('content-type');
-  
+
+      const contentType = response.headers.get("content-type");
       let responseData;
-      if (contentType && contentType.includes('application/json')) {
-        responseData = await response.json(); // Parse as JSON if content-type is JSON
+      if (contentType && contentType.includes("application/json")) {
+        responseData = await response.json();
       } else {
-        responseData = await response.text(); // Parse as plain text if not JSON
+        responseData = await response.text();
       }
-  
-      console.log('Response from backend:', responseData); // Log backend response
-  
+
+      console.log("Response from backend:", responseData);
+
       if (response.ok) {
-        // Success: reset form, show success message, and display sent data
-        setSubmittedData(sentData); // Track the sent data
+        setSubmittedData(sentData);
+        window.alert("Insurance details added successfully!");
         setFormValues({
-          Policy_number: '',
-          provider: '',
-          coverage_amount: '',
-          patient_email: '',
+          Policy_number: "",
+          provider: "",
+          coverage_amount: "",
         });
-        window.alert('Insurance details added successfully!'); // Alert on success
       } else {
-        // Failed response from the server
-        console.error('Failed to add insurance details:', responseData);
+        console.error("Failed to add insurance details:", responseData);
+        setSuccessMessage(""); // Clear success message on failure
       }
     } catch (error) {
-      // Network or other errors
-      console.error('Error adding insurance:', error);
+      console.error("Error adding insurance:", error);
+      setSuccessMessage(""); // Clear success message on error
     }
   };
 
-  
   return (
-    <Grommet theme={theme}>
-      <Box align="center" pad="medium"> {/* Adjust padding to match OrderLabTest */}
-        <Heading level="3">Add Insurance Details</Heading>
-        <Form onSubmit={handleSubmit}>
-          <FormField label="Policy No">
-            <TextInput
-              value={formValues.Policy_number}
-              onChange={handleChange('Policy_number')}
-              placeholder="Enter Policy Number"
-            />
-          </FormField>
-          <FormField label="Provider">
-            <TextInput
-              value={formValues.provider}
-              onChange={handleChange('provider')}
-              placeholder="Enter Provider"
-            />
-          </FormField>
-          <FormField label="Coverage Amount">
-            <TextInput
-              type="number"
-              value={formValues.coverage_amount}
-              onChange={handleChange('coverage_amount')}
-              placeholder="Enter Coverage Amount"
-            />
-          </FormField>
-          <FormField label="Patient Email">
-            <TextInput
-              value={formValues.patient_email}
-              onChange={handleChange('patient_email')}
-              placeholder="Enter Patient Email"
-            />
-          </FormField>
-          <Button type="submit" label="Submit" primary />
-        </Form>
+    <Grommet theme={theme} full>
+      <Box fill>
+        <AppBar>
+          <a style={{ color: "inherit", textDecoration: "inherit" }} href="/">
+            <Heading level="3" margin="none">
+              HMS
+            </Heading>
+          </a>
+        </AppBar>
+        <Box
+          fill
+          pad={{ vertical: "large", horizontal: "medium" }}
+          align="center"
+          justify="start"
+        >
+          <Box align="center" pad="medium">
+            <Heading level="3">Add Insurance Details</Heading>
+            <Form onSubmit={handleSubmit}>
+              <FormField label="Policy No">
+                <TextInput
+                  value={formValues.Policy_number}
+                  onChange={handleChange("Policy_number")}
+                  placeholder="Enter Policy Number"
+                />
+              </FormField>
+              <FormField label="Provider">
+                <TextInput
+                  value={formValues.provider}
+                  onChange={handleChange("provider")}
+                  placeholder="Enter Provider"
+                />
+              </FormField>
+              <FormField label="Coverage Amount">
+                <TextInput
+                  type="number"
+                  value={formValues.coverage_amount}
+                  onChange={handleChange("coverage_amount")}
+                  placeholder="Enter Coverage Amount"
+                />
+              </FormField>
+              <Button type="submit" label="Submit" primary />
+            </Form>
+          </Box>
+        </Box>
       </Box>
     </Grommet>
   );
 };
 
 export default AddInsurance;
-
-
